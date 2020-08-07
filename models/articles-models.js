@@ -3,7 +3,7 @@ const { formatCommentCount } = require("../db/utils/utils");
 
 exports.getArticles = (
   sort_by = "created_at",
-  order = "asc",
+  order = "desc",
   author,
   topic
 ) => {

@@ -30,12 +30,12 @@ describe("/api", () => {
           });
         });
     });
-    test("GET: 200 - default sort order is date asc", () => {
+    test("GET: 200 - default sort order is date desc", () => {
       return supertest(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy("created_at");
+          expect(articles).toBeSortedBy("created_at", { descending: true });
         });
     });
     test("GET: 200 - accepts a sort_by query", () => {
@@ -43,7 +43,7 @@ describe("/api", () => {
         .get("/api/articles?sort_by=comment_count")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy("comment_count");
+          expect(articles).toBeSortedBy("comment_count", { descending: true });
         });
     });
     test("GET: 400 - responds with an appropriate error message where the sort_by column does not exist", () => {
@@ -56,10 +56,10 @@ describe("/api", () => {
     });
     test("GET: 200 - accepts an order query", () => {
       return supertest(app)
-        .get("/api/articles?sort_by=votes&&order=desc")
+        .get("/api/articles?sort_by=votes&&order=asc")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy("votes", { descending: true });
+          expect(articles).toBeSortedBy("votes", { descending: false });
         });
     });
     test("GET: 400 - returns an appropriate error message where the order query does not equal asc/desc", () => {
