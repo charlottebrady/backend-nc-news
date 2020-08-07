@@ -46,10 +46,10 @@ describe("/api", () => {
           expect(articles).toBeSortedBy("comment_count");
         });
     });
-    test("GET: 404 - responds with an appropriate error message where the sort_by column does not exist", () => {
+    test("GET: 400 - responds with an appropriate error message where the sort_by column does not exist", () => {
       return supertest(app)
         .get("/api/articles?sort_by=cats")
-        .expect(404)
+        .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Oh no... sort_by column not found!");
         });
@@ -133,7 +133,7 @@ describe("/api", () => {
           expect(articles).toEqual([]);
         });
     });
-    test("GET: 200 - queries are chainable", () => {
+    test("GET: 200 - queries can be chained", () => {
       return supertest(app)
         .get("/api/articles?author=butter_bridge&&topic=mitch")
         .expect(200)
@@ -257,7 +257,7 @@ describe("/api", () => {
             expect(article.votes).toBe(100);
           });
       });
-      test("PATCH: 400 - responds with an appropriate error message where the user gives a non-sensical inc_votes value", () => {
+      test("PATCH: 400 - responds with an appropriate error message where the user gives an incorrect inc_votes type", () => {
         return supertest(app)
           .patch("/api/articles/1")
           .send({ inc_votes: "cats" })
@@ -338,7 +338,7 @@ describe("/api", () => {
               );
             });
         });
-        test("POST: 400 - responds with an appropriate error message where the user breaks a not nullable contraint", () => {
+        test("POST: 400 - responds with an appropriate error message where the user breaks a not nullable constraint", () => {
           return supertest(app)
             .post("/api/articles/1/comments")
             .send({ body: "comment" })
@@ -399,7 +399,7 @@ describe("/api", () => {
               expect(msg).toBe("Uh oh... article not found!");
             });
         });
-        test("GET: 400 - responds with an appropriate error message if the given article_id is non-sensical", () => {
+        test("GET: 400 - responds with an appropriate error message if the given article_id is of incorrect type", () => {
           return supertest(app)
             .get("/api/articles/cats/comments")
             .expect(400)
@@ -407,12 +407,12 @@ describe("/api", () => {
               expect(msg).toBe("Uh oh... bad request!");
             });
         });
-        test("GET: 200 - response has default sort order of created_at asc", () => {
+        test("GET: 200 - response has default sort order of created_at desc", () => {
           return supertest(app)
             .get("/api/articles/1/comments")
             .expect(200)
             .then(({ body: { comments } }) => {
-              expect(comments).toBeSortedBy("created_at");
+              expect(comments).toBeSortedBy("created_at", { descending: true });
             });
         });
         test("GET: 200 - accepts a sort_by query", () => {
@@ -420,21 +420,21 @@ describe("/api", () => {
             .get("/api/articles/1/comments?sort_by=votes")
             .expect(200)
             .then(({ body: { comments } }) => {
-              expect(comments).toBeSortedBy("votes");
+              expect(comments).toBeSortedBy("votes", { descending: true });
             });
         });
         test("GET: 200 - accepts an order query", () => {
           return supertest(app)
-            .get("/api/articles/1/comments?order=desc")
+            .get("/api/articles/1/comments?order=asc")
             .expect(200)
             .then(({ body: { comments } }) => {
-              expect(comments).toBeSortedBy("created_at", { descending: true });
+              expect(comments).toBeSortedBy("created_at");
             });
         });
-        test("GET: 404 - responds with an appropriate error message where the sort_by column queried does not exist", () => {
+        test("GET: 400 - responds with an appropriate error message where the sort_by column queried does not exist", () => {
           return supertest(app)
             .get("/api/articles/1/comments?sort_by=cats")
-            .expect(404)
+            .expect(400)
             .then(({ body: { msg } }) => {
               expect(msg).toBe("Oh no... sort_by column not found!");
             });

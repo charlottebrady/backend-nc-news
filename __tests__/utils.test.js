@@ -8,8 +8,6 @@ const {
 } = require("../db/utils/utils");
 
 const { articleData, commentData } = require("../db/data");
-//console.log(articleData);
-//console.log(commentData);
 
 describe("formatDates", () => {
   test("returns a new array", () => {
@@ -285,7 +283,7 @@ describe("formatComments", () => {
 });
 
 describe("formatCommentCount", () => {
-  test("returns an array of article objects where the comment_count has been parsed to an intger", () => {
+  test("returns an array of article objects where the comment_count has been parsed to an integer", () => {
     expect(
       formatCommentCount([
         { article_id: 1, comment_count: "12" },

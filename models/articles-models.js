@@ -99,7 +99,7 @@ exports.postComment = (article_id, username, body) => {
     });
 };
 
-exports.getComments = (article_id, sort_by = "created_at", order = "asc") => {
+exports.getComments = (article_id, sort_by = "created_at", order = "desc") => {
   return knex
     .select("*")
     .from("comments")

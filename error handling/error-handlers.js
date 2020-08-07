@@ -8,8 +8,14 @@ exports.customErrorHandler = (err, req, res, next) => {
 };
 
 exports.psqlErrorHandler = (err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Uh oh... bad request!" });
+  const psqlErrCodes = {
+    "22P02": "Uh oh... bad request!",
+    "42703": "Oh no... sort_by column not found!",
+    "23502":
+      "Error! Please provide a valid username and body for your comment!",
+  };
+  if (err.code in psqlErrCodes) {
+    res.status(400).send({ msg: psqlErrCodes[err.code] });
   } else if (err.code === "23503") {
     if (err.constraint === "comments_article_id_foreign") {
       res.status(404).send({ msg: "Whoops... article_id not found!" });
@@ -18,12 +24,6 @@ exports.psqlErrorHandler = (err, req, res, next) => {
         msg:
           "Woah, you're new here! To post comments you need to be a registered user...",
       });
-  } else if (err.code === "42703") {
-    res.status(404).send({ msg: "Oh no... sort_by column not found!" });
-  } else if (err.code === "23502") {
-    res.status(400).send({
-      msg: "Error! Please provide a valid username and body for your comment!",
-    });
   } else {
     next(err);
   }
