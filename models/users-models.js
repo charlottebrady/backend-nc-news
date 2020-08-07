@@ -9,10 +9,25 @@ exports.getUser = (username) => {
       if (user.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: "Whoops... User not found!",
+          msg: "Whoops... user not found!",
         });
       } else {
         return user[0];
+      }
+    });
+};
+
+exports.getUsers = (author) => {
+  return knex
+    .select("*")
+    .from("users")
+    .where("username", "=", author)
+    .then((user) => {
+      if (user.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Whoops... author not found!",
+        });
       }
     });
 };

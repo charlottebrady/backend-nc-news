@@ -4,12 +4,18 @@ const {
   updateArticle,
   postComment,
   getComments,
+  getCommentsByArticleID,
 } = require("../models/articles-models");
+const { getUsers } = require("../models/users-models");
+const { getTopicsBySlug } = require("../models/topics-models");
 
 exports.sendArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
-  getArticles(sort_by, order, author, topic)
-    .then((articles) => {
+  const models = [getArticles(sort_by, order, author, topic)];
+  if (author) models.push(getUsers(author));
+  if (topic) models.push(getTopicsBySlug(topic));
+  Promise.all(models)
+    .then(([articles]) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {
@@ -55,8 +61,12 @@ exports.sendNewComment = (req, res, next) => {
 exports.sendComments = (req, res, next) => {
   const { article_id } = req.params;
   const { sort_by, order } = req.query;
-  getComments(article_id, sort_by, order)
-    .then((comments) => {
+  const models = [
+    getComments(article_id, sort_by, order),
+    getCommentsByArticleID(article_id),
+  ];
+  Promise.all(models)
+    .then(([comments]) => {
       res.status(200).send({ comments });
     })
     .catch((err) => {

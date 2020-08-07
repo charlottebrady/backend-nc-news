@@ -4,6 +4,7 @@ const {
   formatDates,
   makeRefObj,
   formatComments,
+  formatCommentCount,
 } = require("../db/utils/utils");
 
 const { articleData, commentData } = require("../db/data");
@@ -171,7 +172,7 @@ describe("makeRefObj", () => {
   });
 });
 
-describe.only("formatComments", () => {
+describe("formatComments", () => {
   test("returns the formatted comment for an array of one comment", () => {
     const test = [
       {
@@ -280,5 +281,42 @@ describe.only("formatComments", () => {
         created_at: 975242163389,
       },
     ]);
+  });
+});
+
+describe("formatCommentCount", () => {
+  test("returns an array of article objects where the comment_count has been parsed to an intger", () => {
+    expect(
+      formatCommentCount([
+        { article_id: 1, comment_count: "12" },
+        { article_id: 2, comment_count: "3" },
+        { article_id: 3, comment_count: "0" },
+      ])
+    ).toEqual([
+      { article_id: 1, comment_count: 12 },
+      { article_id: 2, comment_count: 3 },
+      { article_id: 3, comment_count: 0 },
+    ]);
+  });
+  test("does not mutate original articles array", () => {
+    const test = [
+      { article_id: 1, comment_count: "12" },
+      { article_id: 2, comment_count: "3" },
+      { article_id: 3, comment_count: "0" },
+    ];
+    formatCommentCount(test);
+    expect(test).toEqual([
+      { article_id: 1, comment_count: "12" },
+      { article_id: 2, comment_count: "3" },
+      { article_id: 3, comment_count: "0" },
+    ]);
+  });
+  test("returns a new array", () => {
+    const test = [
+      { article_id: 1, comment_count: "12" },
+      { article_id: 2, comment_count: "3" },
+      { article_id: 3, comment_count: "0" },
+    ];
+    expect(formatCommentCount(test)).not.toBe(test);
   });
 });

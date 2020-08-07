@@ -30,3 +30,13 @@ exports.formatComments = (comments, articleRef) => {
   });
   return formattedComments;
 };
+
+exports.formatCommentCount = (articles) => {
+  const formattedArticles = [];
+  articles.forEach((article) => {
+    const articleCopy = { ...article };
+    articleCopy.comment_count = parseInt(article.comment_count);
+    formattedArticles.push(articleCopy);
+  });
+  return formattedArticles;
+};

@@ -33,5 +33,29 @@ describe("/api", () => {
           expect(res.body.topics).toBeSortedBy("slug");
         });
     });
+    test("ALL: 404 - responds with an appropriate error message where the path is non-existent", () => {
+      const methods = ["get", "post", "patch", "delete", "put"];
+      const promises = methods.map((method) => {
+        return supertest(app)
+          [method]("/apj/topicz")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Uh oh... path not found!");
+          });
+      });
+      return Promise.all(promises);
+    });
+    test("INVALID METHODS: 405 - responds with an appropriate error message when using an invalid method on endpoint", () => {
+      const invalidMethods = ["post", "put", "delete", "patch"];
+      const promises = invalidMethods.map((method) => {
+        return supertest(app)
+          [method]("/api/topics")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Oops... invalid method!");
+          });
+      });
+      return Promise.all(promises);
+    });
   });
 });

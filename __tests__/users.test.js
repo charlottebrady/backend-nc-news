@@ -15,10 +15,10 @@ describe("/api", () => {
         return supertest(app)
           .get("/api/users/butter_bridge")
           .expect(200)
-          .then((res) => {
-            expect(res.body.user).toEqual(
+          .then(({ body: { user } }) => {
+            expect(user).toEqual(
               expect.objectContaining({
-                username: expect.any(String),
+                username: "butter_bridge",
                 avatar_url: expect.any(String),
                 name: expect.any(String),
               })
@@ -29,9 +29,33 @@ describe("/api", () => {
         return supertest(app)
           .get("/api/users/user123")
           .expect(404)
-          .then((res) => {
-            expect(res.body.msg).toBe("Whoops... User not found!");
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Whoops... user not found!");
           });
+      });
+      test("ALL: 404 - responds with an appropriate error message where the path is non-existent", () => {
+        const methods = ["get", "post", "patch", "delete", "put"];
+        const promises = methods.map((method) => {
+          return supertest(app)
+            [method]("/apo/user/butter_bridge")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Uh oh... path not found!");
+            });
+        });
+        return Promise.all(promises);
+      });
+      test("INVALID METHODS: 405 - responds with an appropriate error message when using an invalid method on endpoint", () => {
+        const invalidMethods = ["post", "put", "delete", "patch"];
+        const promises = invalidMethods.map((method) => {
+          return supertest(app)
+            [method]("/api/users/butter_bridge")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Oops... invalid method!");
+            });
+        });
+        return Promise.all(promises);
       });
     });
   });
